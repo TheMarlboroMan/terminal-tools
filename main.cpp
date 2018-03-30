@@ -1,5 +1,5 @@
 #include <iostream>
-#include "src/terminaltools.cpp"
+#include "src/terminaltools.h"
 
 //TODO: Perhaps create a new class for all this crap.
 void draw_hline(int _pos, int _w, char _reg, char _bgn=0, char _end=0) {
@@ -38,11 +38,6 @@ void draw_box() {
 }
 
 int main(int argc, char ** argv) {
-
-	set_size_change_handler([](int) {
-		draw_box();
-		std::cout<<tools::s::pos(2,2)<<tools::s::flush();
-	});
 
 	draw_box();
 	std::cout<<tools::s::pos(2, 2)<<tools::s::flush();

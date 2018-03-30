@@ -8,7 +8,9 @@
 #include <unistd.h>
 #include <signal.h>
 
-using namespace tools;
+const std::string esseq="\033["; //! <Escape sequence.
+std::function<void(int)> fn_winch_handler;	//! <std function to help with window resizing.
+//std::function<void(int)> tools::fn_winch_handler=nullptr;	//! <std function to help with window resizing.
 
 void tools::do_sigwinch_handler(int _sig) {
 	if(_sig==SIGWINCH && fn_winch_handler) {
@@ -21,31 +23,31 @@ void tools::set_size_change_handler(const std::function<void(int)>& fn) {
 	fn_winch_handler=fn;
 }
 
-termsize tools::get_termsize() {
+tools::termsize tools::get_termsize() {
 	winsize ws;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
-	return termsize{ws.ws_col, ws.ws_row};
+	return tools::termsize{ws.ws_col, ws.ws_row};
 }
 
 
 //Set of functions with stream as parameter.
 std::ostream& tools::f::save_pos(std::ostream& _s) {
-	return _s<<tools::esseq<<"s";
+	return _s<<esseq<<"s";
 }
 
 std::ostream& tools::f::load_pos(std::ostream& _s) {
-	return _s<<tools::esseq<<"u";
+	return _s<<esseq<<"u";
 }
 
 std::ostream& tools::f::pos(std::ostream& _s, int x, int y) {
-	return _s<<tools::esseq<<y<<";"<<x<<"f";
+	return _s<<esseq<<y<<";"<<x<<"f";
 }
 
 std::ostream& tools::f::clear_line(std::ostream& _s, int _y) {
 	if(_y) {
 		tools::f::pos(_s, 1, _y);
 	}
-	return _s<<tools::esseq<<"2K";
+	return _s<<esseq<<"2K";
 }
 
 std::ostream& tools::f::clear_line(std::ostream& _s, int _from, int _to) {
@@ -57,7 +59,7 @@ std::ostream& tools::f::clear_line(std::ostream& _s, int _from, int _to) {
 
 	tools::f::pos(_s, 1, _from);
 	for(_from; _from<_to; _from++) {
-		_s<<tools::esseq<<"2K";
+		_s<<esseq<<"2K";
 		tools::f::move(_s, tools::mv::down);
 	}
 
@@ -65,32 +67,32 @@ std::ostream& tools::f::clear_line(std::ostream& _s, int _from, int _to) {
 }
 
 std::ostream& tools::f::reset(std::ostream& _s) {
-	return _s<<tools::esseq<<"2J";
+	return _s<<esseq<<"2J";
 }
 
 std::ostream& tools::f::move(std::ostream& _s, tools::mv _d, int _dist) {
 	switch(_d) {
 		case tools::mv::up: 
-			return _s<<tools::esseq<<_dist<<"A"; break;
+			return _s<<esseq<<_dist<<"A"; break;
 		case tools::mv::right: 
-			return _s<<tools::esseq<<_dist<<"C"; break;
+			return _s<<esseq<<_dist<<"C"; break;
 		case tools::mv::down: 
-			return _s<<tools::esseq<<_dist<<"B"; break;
+			return _s<<esseq<<_dist<<"B"; break;
 		case tools::mv::left:  
-			return _s<<tools::esseq<<_dist<<"D"; break;
+			return _s<<esseq<<_dist<<"D"; break;
 	}
 }
 
 std::ostream& tools::f::reset_text(std::ostream& _s) {
-	return _s<<tools::esseq<<"0m";
+	return _s<<esseq<<"0m";
 }
 
 std::ostream& tools::f::text_effect(std::ostream& _s, int _eff) {
-	return _s<<tools::esseq<<_eff<<"m";
+	return _s<<esseq<<_eff<<"m";
 }
 
 std::ostream& tools::f::text_effect(std::ostream& _s, const std::vector<int>& _eff) {
-	_s<<tools::esseq;
+	_s<<esseq;
 	for(const auto& i : _eff) {
 		_s<<i<<(i==*std::prev(std::end(_eff)) ? 'm' : ';');
 	}
@@ -114,4 +116,17 @@ std::ostream& tools::f::background_color(std::ostream& _s, int _clr) {
 std::ostream& tools::f::flush(std::ostream& _s) {
 	return std::flush(_s); //May seem redundant, but well... for completeness sake :).
 }
+
+//Set of stream manipulator functions...
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::save_pos& _t) {return tools::f::save_pos(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::load_pos& _t) {return tools::f::load_pos(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::pos& _t) {return tools::f::pos(_s, _t.x, _t.y);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::move& _t) {return tools::f::move(_s, _t.m, _t.d);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_line& _t) {return _t.t==-1 ? tools::f::clear_line(_s, _t.f) : tools::f::clear_line(_s, _t.f, _t.t);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset& _t) {return tools::f::reset(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_color& _t) {return tools::f::text_color(_s, _t.v);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::background_color& _t) {return tools::f::background_color(_s, _t.v);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_effect& _t) {return _t.v==-1 ? tools::f::text_effect(_s, _t.vec) : tools::f::text_effect(_s, _t.v);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset_text& _t) {return tools::f::reset_text(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::flush& _t) {return tools::f::flush(_s);}
 

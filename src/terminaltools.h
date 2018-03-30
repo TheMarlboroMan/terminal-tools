@@ -26,9 +26,6 @@ enum bg_colors {bg_min=39, bg_black, bg_red, bg_green, bg_yellow, bg_blue,
 //!To be used with "move" function.
 enum class mv{up, right, down, left};
 
-const std::string esseq="\033["; //! <Escape sequence.
-std::function<void(int)> fn_winch_handler;	//! <std function to help with window resizing.
-
 //!Internal use: will call the fn_winch_handler function if set.
 void do_sigwinch_handler(int _sig);
 //!Sets the fn_winch_handler function to handle window resizing.
@@ -79,50 +76,50 @@ termsize get_termsize();
 
 	//!Saves cursor position.
 	struct save_pos{};
-	std::ostream& operator<<(std::ostream& _s, const struct save_pos& _t) {return f::save_pos(_s);}
+	std::ostream& operator<<(std::ostream& _s, const save_pos& _t);
 
 	//!Restores cursor position from a previous save.
 	struct load_pos{};
-	std::ostream& operator<<(std::ostream& _s, const struct load_pos& _t) {return f::load_pos(_s);}
+	std::ostream& operator<<(std::ostream& _s, const load_pos& _t);
 
 	//!Moves cursor to position.
 	struct pos{int x, y; pos(int _x, int _y):x(_x), y(_y){}};
-	std::ostream& operator<<(std::ostream& _s, const struct pos& _t) {return f::pos(_s, _t.x, _t.y);}
+	std::ostream& operator<<(std::ostream& _s, const pos& _t);
 
 	//!Moves cursor into direction mv for n spaces.
 	struct move{mv m; int d; move(mv _m, int _d=1):m(_m), d(_d){}};
-	std::ostream& operator<<(std::ostream& _s, const struct move& _t) {return f::move(_s, _t.m, _t.d);}
+	std::ostream& operator<<(std::ostream& _s, const move& _t);
 
 	//!Clears the current or specified line
 	struct clear_line{int f, t; clear_line(int _f=0, int _t=-1):f(_f), t(_t){}};
-	std::ostream& operator<<(std::ostream& _s, const struct clear_line& _t) {return _t.t==-1 ? f::clear_line(_s, _t.f) : f::clear_line(_s, _t.f, _t.t);}
+	std::ostream& operator<<(std::ostream& _s, const clear_line& _t);
 
 	//!Resets the terminal.
 	struct reset{};
-	std::ostream& operator<<(std::ostream& _s, const struct reset& _t) {return f::reset(_s);}
+	std::ostream& operator<<(std::ostream& _s, const reset& _t);
 
 	//!Sets the text color. May throw if the value is not in the range of txt_colors.
 	struct text_color{int v; text_color(int _v):v(_v) {}};
-	std::ostream& operator<<(std::ostream& _s, const struct text_color& _t) {return f::text_color(_s, _t.v);}
+	std::ostream& operator<<(std::ostream& _s, const text_color& _t);
 
 	//!Sets the background color. May throw if the value is not in the range of bg_colors.
 	struct background_color{int v; background_color(int _v):v(_v) {}};
-	std::ostream& operator<<(std::ostream& _s, const struct background_color& _t) {return f::background_color(_s, _t.v);}
+	std::ostream& operator<<(std::ostream& _s, const background_color& _t);
 
 	//!Sets the text effect (see table below).
 	struct text_effect{int v; std::vector<int> vec;
 		text_effect(int _v):v(_v) {}
 		text_effect(const std::vector<int>& _v):v(-1), vec(_v) {}
 	};
-	std::ostream& operator<<(std::ostream& _s, const struct text_effect& _t) {return _t.v==-1 ? f::text_effect(_s, _t.vec) : f::text_effect(_s, _t.v);}
+	std::ostream& operator<<(std::ostream& _s, const text_effect& _t);
 
 	//!Resets all text effects and colours.
 	struct reset_text{};
-	std::ostream& operator<<(std::ostream& _s, const struct reset_text& _t) {return f::reset_text(_s);}
+	std::ostream& operator<<(std::ostream& _s, const reset_text& _t);
 
 	//!Flushes the stream.
 	struct flush{};
-	std::ostream& operator<<(std::ostream& _s, const struct flush& _t) {return f::flush(_s);}
+	std::ostream& operator<<(std::ostream& _s, const flush& _t);
 }
 
 /*
