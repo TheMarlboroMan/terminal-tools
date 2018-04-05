@@ -43,30 +43,34 @@ termsize get_termsize();
 	namespace f {
 
 	//!Saves cursor position.
-	std::ostream& save_pos(std::ostream&);
+	std::ostream&	save_pos(std::ostream&);
 	//!Restores cursor position from a previous save.
-	std::ostream& load_pos(std::ostream&);
+	std::ostream&	load_pos(std::ostream&);
 	//!Moves cursor to position.
-	std::ostream& pos(std::ostream&, int, int);
+	std::ostream&	pos(std::ostream&, int, int);
 	//!Moves cursor into direction mv for n spaces.
-	std::ostream& move(std::ostream&, mv, int=1);
+	std::ostream&	move(std::ostream&, mv, int=1);
 	//!Clears the current or specified line
-	std::ostream& clear_line(std::ostream&, int=0);
-	std::ostream& clear_line(std::ostream&, int, int);
+	std::ostream&	clear_line(std::ostream&, int=0);
+	std::ostream&	clear_line(std::ostream&, int, int);
 	//!Resets the terminal.
-	std::ostream& reset(std::ostream&);
+	std::ostream&	reset(std::ostream&);
 	//!Sets the text color. May throw if the value is not in the range of txt_colors.
-	std::ostream& text_color(std::ostream&, int);
+	std::ostream&	text_color(std::ostream&, int);
 	//!Sets the background color. May throw if the value is not in the range of bg_colors.
-	std::ostream& background_color(std::ostream&, int); 
+	std::ostream&	background_color(std::ostream&, int); 
 	//!Sets the text effect (see table below).
-	std::ostream& text_effect(std::ostream&, int);
+	std::ostream&	text_effect(std::ostream&, int);
 	//!Sets the vector of text effects (see table below).
-	std::ostream& text_effect(std::ostream&, const std::vector<int>&);
+	std::ostream&	text_effect(std::ostream&, const std::vector<int>&);
 	//!Resets all text effects and colours.
-	std::ostream& reset_text(std::ostream&);
+	std::ostream&	reset_text(std::ostream&);
 	//!Flushes the stream.
-	std::ostream& flush(std::ostream&);
+	std::ostream&	flush(std::ostream&);
+	//!Hides the cursor
+	std::ostream&	hide(std::ostream&);
+	//!Displays the cursor
+	std::ostream&	show(std::ostream&);
 }
 
 //These are the stream ones. They seem messy, but are actually small proxies
@@ -120,6 +124,14 @@ termsize get_termsize();
 	//!Flushes the stream.
 	struct flush{};
 	std::ostream& operator<<(std::ostream& _s, const flush& _t);
+
+	//!Hides the cursor
+	struct hide{};
+	std::ostream& operator<<(std::ostream& _s, const hide& _t);
+
+	//!Displays the cursor
+	struct show{};
+	std::ostream& operator<<(std::ostream& _s, const show& _t);
 }
 
 /*

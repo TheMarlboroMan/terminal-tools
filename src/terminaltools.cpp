@@ -117,6 +117,14 @@ std::ostream& tools::f::flush(std::ostream& _s) {
 	return std::flush(_s); //May seem redundant, but well... for completeness sake :).
 }
 
+std::ostream& tools::f::hide(std::ostream& _s) {
+	_s<<esseq<<"[?25l";
+}
+
+std::ostream& tools::f::show(std::ostream& _s) {
+	_s<<esseq<<"[?25h";
+}
+
 //Set of stream manipulator functions...
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::save_pos& _t) {return tools::f::save_pos(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::load_pos& _t) {return tools::f::load_pos(_s);}
@@ -129,4 +137,5 @@ std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::background_
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_effect& _t) {return _t.v==-1 ? tools::f::text_effect(_s, _t.vec) : tools::f::text_effect(_s, _t.v);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset_text& _t) {return tools::f::reset_text(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::flush& _t) {return tools::f::flush(_s);}
-
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::hide& _t) {return tools::f::hide(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::show& _t) {return tools::f::show(_s);}
