@@ -50,9 +50,13 @@ termsize get_termsize();
 	std::ostream&	pos(std::ostream&, int, int);
 	//!Moves cursor into direction mv for n spaces.
 	std::ostream&	move(std::ostream&, mv, int=1);
-	//!Clears the current or specified line
+	//!Clears the current or specified range of lines.
 	std::ostream&	clear_line(std::ostream&, int=0);
 	std::ostream&	clear_line(std::ostream&, int, int);
+	//!Clears the current line to the right.
+	std::ostream&	clear_right(std::ostream&);
+	//!Clears the current line to the left.
+	std::ostream&	clear_left(std::ostream&);
 	//!Resets the terminal.
 	std::ostream&	reset(std::ostream&);
 	//!Sets the text color. May throw if the value is not in the range of txt_colors.
@@ -94,9 +98,17 @@ termsize get_termsize();
 	struct move{mv m; int d; move(mv _m, int _d=1):m(_m), d(_d){}};
 	std::ostream& operator<<(std::ostream& _s, const move& _t);
 
-	//!Clears the current or specified line
+	//!Clears the current or specified range of lines.
 	struct clear_line{int f, t; clear_line(int _f=0, int _t=-1):f(_f), t(_t){}};
 	std::ostream& operator<<(std::ostream& _s, const clear_line& _t);
+
+	//!Clears the current line to the left.
+	struct clear_left{};
+	std::ostream& operator<<(std::ostream& _s, const clear_left& _t);
+
+	//!Clears the current line to the right.
+	struct clear_right{};
+	std::ostream& operator<<(std::ostream& _s, const clear_right& _t);
 
 	//!Resets the terminal.
 	struct reset{};

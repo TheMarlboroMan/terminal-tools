@@ -66,6 +66,14 @@ std::ostream& tools::f::clear_line(std::ostream& _s, int _from, int _to) {
 	return _s;
 }
 
+std::ostream& tools::f::clear_right(std::ostream& _s) {
+	return _s<<esseq<<"0K";
+}
+
+std::ostream& tools::f::clear_left(std::ostream& _s) {
+	return _s<<esseq<<"1K";
+}
+
 std::ostream& tools::f::reset(std::ostream& _s) {
 	return _s<<esseq<<"2J";
 }
@@ -131,6 +139,8 @@ std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::load_pos& _
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::pos& _t) {return tools::f::pos(_s, _t.x, _t.y);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::move& _t) {return tools::f::move(_s, _t.m, _t.d);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_line& _t) {return _t.t==-1 ? tools::f::clear_line(_s, _t.f) : tools::f::clear_line(_s, _t.f, _t.t);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_left& _t) {return tools::f::clear_left(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_right& _t) {return tools::f::clear_right(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset& _t) {return tools::f::reset(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_color& _t) {return tools::f::text_color(_s, _t.v);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::background_color& _t) {return tools::f::background_color(_s, _t.v);}
