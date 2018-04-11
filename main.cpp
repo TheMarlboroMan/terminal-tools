@@ -41,7 +41,7 @@ void draw_box() {
 int main(int argc, char ** argv) {
 
 	draw_box();
-	std::cout<<tools::s::pos(2, 2)<<"Hit x to exit"<<tools::s::flush();
+	std::cout<<tools::s::pos(2, 2)<<"Hit x to exit "<<sizeof(char)<<tools::s::flush();
 
 	unsigned count=0;
 

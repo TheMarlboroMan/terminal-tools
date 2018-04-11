@@ -3,6 +3,10 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <string> //Getline... TODO
+#include <cstring>
+#include <climits> //CHAR_BIT
+
 #include <fcntl.h>
 
 using namespace tools;
@@ -11,6 +15,8 @@ terminal_in::terminal_in() {
 
 	FD_ZERO(&set);
 	FD_SET(STDIN_FILENO, &set);
+
+	memset(&terminal_savestate, 0, sizeof(termios));
 
 	int fl;
 	if ((fl = fcntl (STDIN_FILENO, F_GETFL)) < 0) {
@@ -56,52 +62,66 @@ void terminal_in::flush() {
 	}
 }
 
-	//TODO like... terrible XD!.
 terminal_in_data& terminal_in::get() {
 
 	data.reset();
+	auto debug_buffer=[this](int read) {
+		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
+		for(int i=0; i<read; i++) {
+			std::cout<<i<<":"<<(unsigned short)buffer[i]<<" ("<<sizeof(buffer[i])<<") "<<CHAR_BIT<<" | ";
+		}
+		std::cout<<std::endl;
+	};
 
 	//This prevents blocking.
 	timeval tv {0, 10000};
 	auto cp=set;
-	if(select(STDIN_FILENO+1, &cp, nullptr, nullptr, &tv)) {
+	if(select(STDIN_FILENO+1, &cp, nullptr, nullptr, &tv) > 0) {
 
-		//TODO: Please do this right... 
-		//We can either read 3 at a time and hope for the best
-		//or read two if we get a scape.
-		char c;
-		read(STDIN_FILENO, &c, 1);
+		memset(buffer, 0, sizeof(buffer_size));
+		int readcount=read(STDIN_FILENO, buffer, buffer_size);
 
-		//TODO: No magic numbers!
-		//This is the begin of a scape sequence...
-		if(c==27) {
-			read(STDIN_FILENO, &c, 1);
-			//This is "["
-			//TODO; No magic numbers!
-			if(c==91) {
-				read(STDIN_FILENO, &c, 1);
-				//These are actually the cursors!.
-				switch(c) {
-					case 'A': data.arrow=terminal_in_data::arrowkeys::up; break;
-					case 'B': data.arrow=terminal_in_data::arrowkeys::down; break;
-					case 'C': data.arrow=terminal_in_data::arrowkeys::right; break;
-					case 'D': data.arrow=terminal_in_data::arrowkeys::left; break;
-				}
+		//This is an alternative too...
+//		std::string buffer;
+//		std::getline(std::cin, buffer);
+//		std::cin.clear();
+//		int readcount=buffer.size();
+
+		if(readcount==1) {
+			switch(buffer[0]) {
+				case cc_backspace:
+					data.set_control(terminal_in_data::controls::backspace); break;
+				case cc_tab:
+					data.set_control(terminal_in_data::controls::tab); break;
+				case cc_enter:
+					data.set_control(terminal_in_data::controls::enter); break;
+				default:
+					if(isprint(buffer[0])) {
+						data.set_char(buffer[0]);
+					}
+					else {
+						data.set_unknown();
+						debug_buffer(readcount);
+					}
+				break;
 			}
-			//Control + keys and stuff... Control+C will still work :D.
-			else {
-				//TODO... Ok??? Shouldn't we just consume what we need?
-				flush(); //Lol
-			}
-		}
-		//Backspace, chars...
-		//TODO: No ,magic sequences!
-		else if(c==127 || isprint(c)) {
-			data.c=c;
 		}
 		else {
-			//TODO... Ok??? Shouldn't we just consume what we need?
-			flush(); //Lol
+			if(buffer[0]==27) {
+				//This is "["
+				//TODO; No magic numbers!
+				if(buffer[1]==91) {
+					data.set_arrow_from_char(buffer[2]);
+				}
+				else {
+					data.set_unknown();
+					debug_buffer(readcount);
+				}
+			}
+			else {
+				data.set_unknown();
+				debug_buffer(readcount);
+			}
 		}
 	}
 
