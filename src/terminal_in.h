@@ -14,6 +14,7 @@ struct terminal_in_data {
 	bool 		is_arrow() const {return arrow!=arrowkeys::none;}
 	bool 		is_char() const {return c;}
 	bool 		is_backspace() const {return c==127;}
+	void		reset() {c=0; arrow=arrowkeys::none;}
 	//TODO: And TAB????
 	//TODO: And ENTER???
 

@@ -43,20 +43,20 @@ int main(int argc, char ** argv) {
 	draw_box();
 	std::cout<<tools::s::pos(2, 2)<<"Hit x to exit"<<tools::s::flush();
 
-	try {
-		tools::terminal_in ti;
-		while(true) {
-			auto d=ti.get();
-			if(d) {
-				if(d.c=='x' || d.c=='X') {
-					break;
-				}
-				else {
-					std::cout<<tools::s::pos(2, 2)<<"Please, hit x to exit"<<tools::s::flush();
-				}
+	unsigned count=0;
+
+	tools::terminal_in ti;
+	while(true) {
+		auto d=ti.get();
+		if(d) {
+			if(d.c=='x' || d.c=='X') {
+				break;
+			}
+			else {
+				std::cout<<tools::s::pos(2, 2)<<"Please, hit x to exit. You did "<<(++count)<<" inputs"<<tools::s::flush();
 			}
 		}
 	}
-	catch(...) {
-	}
+
+	std::cout<<tools::s::pos(2, 3)<<tools::s::flush();
 }

@@ -59,6 +59,8 @@ void terminal_in::flush() {
 	//TODO like... terrible XD!.
 terminal_in_data& terminal_in::get() {
 
+	data.reset();
+
 	//This prevents blocking.
 	timeval tv {0, 10000};
 	auto cp=set;
