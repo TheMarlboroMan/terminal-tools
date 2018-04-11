@@ -1,4 +1,4 @@
-#include "terminaltools.h"
+#include "terminal_out.h"
 
 #include <iostream>
 #include <iterator>
@@ -58,7 +58,7 @@ std::ostream& tools::f::clear_line(std::ostream& _s, int _from, int _to) {
 	}
 
 	tools::f::pos(_s, 1, _from);
-	for(_from; _from<_to; _from++) {
+	for(; _from<_to; _from++) {
 		_s<<esseq<<"2K";
 		tools::f::move(_s, tools::mv::down);
 	}
@@ -89,6 +89,9 @@ std::ostream& tools::f::move(std::ostream& _s, tools::mv _d, int _dist) {
 		case tools::mv::left:  
 			return _s<<esseq<<_dist<<"D"; break;
 	}
+
+	//Stupid compiler...
+	return _s;
 }
 
 std::ostream& tools::f::reset_text(std::ostream& _s) {
@@ -127,10 +130,12 @@ std::ostream& tools::f::flush(std::ostream& _s) {
 
 std::ostream& tools::f::hide(std::ostream& _s) {
 	_s<<esseq<<"[?25l";
+	return _s;
 }
 
 std::ostream& tools::f::show(std::ostream& _s) {
 	_s<<esseq<<"[?25h";
+	return _s;
 }
 
 //Set of stream manipulator functions...

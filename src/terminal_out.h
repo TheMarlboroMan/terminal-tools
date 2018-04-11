@@ -1,5 +1,5 @@
-#ifndef TERMINAL_TOOLS_H
-#define TERMINAL_TOOLS_H
+#ifndef TOOLS_TERMINAL_OUT_H
+#define TOOLS_TERMINAL_OUT_H
 
 //!Raw set of terminal tools. May be easily wrapped in a class.
 

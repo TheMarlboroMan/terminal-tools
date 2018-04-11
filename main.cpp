@@ -1,5 +1,6 @@
 #include <iostream>
-#include "src/terminaltools.h"
+#include "src/terminal_out.h"
+#include "src/terminal_in.h"
 
 //TODO: Perhaps create a new class for all this crap.
 void draw_hline(int _pos, int _w, char _reg, char _bgn=0, char _end=0) {
@@ -40,11 +41,21 @@ void draw_box() {
 int main(int argc, char ** argv) {
 
 	draw_box();
-	std::cout<<tools::s::pos(2, 2)<<tools::s::flush();
+	std::cout<<tools::s::pos(2, 2)<<"Hit x to exit"<<tools::s::flush();
 
 	try {
-		char c;
-		std::cin>>c;
+		tools::terminal_in ti;
+		while(true) {
+			auto d=ti.get();
+			if(d) {
+				if(d.c=='x' || d.c=='X') {
+					break;
+				}
+				else {
+					std::cout<<tools::s::pos(2, 2)<<"Please, hit x to exit"<<tools::s::flush();
+				}
+			}
+		}
 	}
 	catch(...) {
 	}
