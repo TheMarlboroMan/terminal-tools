@@ -11,6 +11,49 @@
 
 using namespace tools;
 
+void terminal_in_data::set_unknown() {
+	type=types::unknown;
+}
+
+void terminal_in_data::set_arrow_from_char(char _c) {
+
+	type=types::arrow;
+	switch(_c) {
+		case 'A': arrow=arrowkeys::up; break;
+		case 'B': arrow=arrowkeys::down; break;
+		case 'C': arrow=arrowkeys::right; break;
+		case 'D': arrow=arrowkeys::left; break;
+		default: type=types::unknown; break;
+	}
+}
+
+void terminal_in_data::set_char(char _c) {
+	c=_c;
+	type=types::chr;
+}
+
+void terminal_in_data::set_control(controls _c) {
+	control=_c;
+	type=types::control;
+}
+
+void terminal_in_data::reset() {
+	type=types::none;
+	c=0; 
+	arrow=arrowkeys::none;
+	control=controls::none;
+}
+
+//TODO: And TAB????
+//TODO: And ENTER???
+//TODO: And function keys??
+//TODO: And unicode crap???
+
+terminal_in_data::terminal_in_data():
+	type{types::none}, c{0}, arrow{arrowkeys::none}, control{controls::none} {
+}
+
+
 terminal_in::terminal_in() {
 
 	FD_ZERO(&set);

@@ -7,7 +7,7 @@ all: objdir main.cpp obj/terminal_out.o obj/terminal_in.o
 	$(COMPILER) $(CFLAGS) $(DEBUG) main.cpp obj/terminal_out.o obj/terminal_in.o -o a.out
 
 objdir:
-	mkdir obj;
+	mkdir -p obj;
 
 clean:
 	rm -rf obj; rmdir obj; rm ./a.out; 

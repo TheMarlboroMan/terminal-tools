@@ -2,7 +2,7 @@
 #include "src/terminal_out.h"
 #include "src/terminal_in.h"
 
-//TODO: Perhaps create a new class for all this crap.
+/*
 void draw_hline(int _pos, int _w, char _reg, char _bgn=0, char _end=0) {
 
 	_bgn=_bgn ? _bgn : _reg;
@@ -37,26 +37,61 @@ void draw_box() {
 	draw_vline(ts.w, ts.h, '|', '#', '#');
 	std::cout<<s::reset_text()<<s::flush();
 }
+*/
 
 int main(int argc, char ** argv) {
 
-	draw_box();
-	std::cout<<tools::s::pos(2, 2)<<"Hit x to exit "<<sizeof(char)<<tools::s::flush();
+	const size_t		max_history_size=10;
 
-	unsigned count=0;
+	tools::terminal_in		ti;
+	std::string 			command;
+	std::vector<std::string> 	history;
+	bool 				running=true;
+	size_t 				arrow_presses=0;
 
-	tools::terminal_in ti;
-	while(true) {
-		auto d=ti.get();
-		if(d) {
-			if(d.c=='x' || d.c=='X') {
+	history.reserve(max_history_size);
+
+	std::cout<<tools::s::reset();
+
+	while(running) {
+		std::flush(std::cout);
+		auto id=ti.get();
+
+		if(id) {
+			switch(id.type) {
+				case id.types::chr:
+					command+=id.c; break;
+				case id.types::arrow:
+					std::cout<<tools::s::pos(1,1)<<"Good arrow press ("<<arrow_presses<<")..."<<std::endl; 
+					++arrow_presses; break;
+
+				case id.types::controls:
+					switch(id.control) {
+						case id.controls::backspace:
+							if(command.size()) command.pop_back(); break;
+						case id.controls::enter:
+							history.insert(std::begin(history), command);
+							if(history.size() > max_history_size) history.pop_back();
+
+							if(command=="exit") running=false;
+							else command.clear();
+						break;
+						case id.controls::tab:
+							command+="\t"; break;
+						case id.controls::none: break;
+					}
 				break;
-			}
-			else {
-				std::cout<<tools::s::pos(2, 2)<<"Please, hit x to exit. You did "<<(++count)<<" inputs"<<tools::s::flush();
+				case id.types::none:
+				case id.types::unknown: break;
 			}
 		}
+
+		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
+		for(const auto& _s : history) {
+			std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
+		}
+		std::cout<<tools::s::pos(3+command.size(),2)<<tools::s::flush();
 	}
 
-	std::cout<<tools::s::pos(2, 3)<<tools::s::flush();
+	return 0;
 }

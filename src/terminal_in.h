@@ -14,54 +14,13 @@ struct terminal_in_data {
 	enum class 	arrowkeys {none, up, down, left, right};
 	enum class	controls {none, enter, backspace, tab};
 
+			terminal_in_data();
 			operator bool() const {return type!=types::none;}
-
-	//TODO: In implementation file.
-	bool 		is_char() const {return c;}
-	
-	void		set_unknown() {
-		type=types::unknown;
-	}
-
-	void		set_arrow_from_char(char _c) {
-
-		type=types::arrow;
-		switch(_c) {
-			case 'A': arrow=arrowkeys::up; break;
-			case 'B': arrow=arrowkeys::down; break;
-			case 'C': arrow=arrowkeys::right; break;
-			case 'D': arrow=arrowkeys::left; break;
-			default: type=types::unknown; break;
-		}
-	}
-
-	void		set_char(char _c) {
-		c=_c;
-		type=types::chr;
-	}
-
-	void		set_control(controls _c) {
-		control=_c;
-		type=types::control;
-	}
-
-	void		reset() {
-		type=types::none;
-		c=0; 
-		arrow=arrowkeys::none;
-		control=controls::none;
-	}
-	//TODO: And TAB????
-	//TODO: And ENTER???
-	//TODO: And function keys??
-	//TODO: And unicode crap???
-
-			terminal_in_data():
-		type{types::none}, c{0}, arrow{arrowkeys::none}, control{controls::none} {
-	
-	}
-
-	types		get_type() const {return type;}
+	void		set_unknown();
+	void		set_arrow_from_char(char _c);
+	void		set_char(char _c);
+	void		set_control(controls _c);
+	void		reset();
 
 	types		type;
 	char 		c;
