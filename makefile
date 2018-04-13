@@ -3,8 +3,11 @@ COMPILER=g++
 DEBUG=-g
 CFLAGS=-Wno-deprecated -Wall -ansi -pedantic -std=c++11 -Wfatal-errors
 
-all: main.cpp obj/terminal_out.o obj/terminal_in.o
+all: objdir main.cpp obj/terminal_out.o obj/terminal_in.o
 	$(COMPILER) $(CFLAGS) $(DEBUG) main.cpp obj/terminal_out.o obj/terminal_in.o -o a.out
+
+objdir:
+	mkdir obj;
 
 clean:
 	rm obj/*; rm ./a.out;
