@@ -112,14 +112,13 @@ terminal_in_data& terminal_in::get() {
 
 	data.reset();
 
-	//TODO... Oh, I see...
-	auto debug_buffer=[this](int read) {
-		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
-		for(int i=0; i<read; i++) {
-			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
-		}
-		std::cout<<std::endl;
-	};
+//	auto debug_buffer=[this](int read) {
+//		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
+//		for(int i=0; i<read; i++) {
+//			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
+//		}
+//		std::cout<<std::endl;
+//	};
 
 	//This prevents blocking.
 	timeval tv {0, 10000};
@@ -160,7 +159,7 @@ terminal_in_data& terminal_in::get() {
 					}
 					else {
 						data.set_unknown();
-						debug_buffer(readcount);
+//						debug_buffer(readcount);
 					}
 				break;
 				default:
