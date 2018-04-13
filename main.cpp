@@ -1,6 +1,10 @@
 #include <iostream>
+
+#include <utf8-tools.h>
+
 #include "src/terminal_out.h"
 #include "src/terminal_in.h"
+
 
 /*
 void draw_hline(int _pos, int _w, char _reg, char _bgn=0, char _end=0) {
@@ -46,10 +50,11 @@ int main(int argc, char ** argv) {
 	tools::terminal_in		ti;
 	std::string 			command;
 	std::vector<std::string> 	history;
-	bool 				running=true;
+	bool 				running=true,
+					redraw=false;
 	size_t 				arrow_presses=0;
 
-	history.reserve(max_history_size);
+	history.reserve(max_history_size+1);
 
 	std::cout<<tools::s::reset();
 
@@ -60,7 +65,8 @@ int main(int argc, char ** argv) {
 		if(id) {
 			switch(id.type) {
 				case id.types::chr:
-					command+=id.c; break;
+				case id.types::utf8:
+					command+=id.get_string_data(); break;
 				case id.types::arrow:
 					std::cout<<tools::s::pos(1,1)<<"Good arrow press ("<<arrow_presses<<")..."<<std::endl; 
 					++arrow_presses; break;
@@ -68,11 +74,11 @@ int main(int argc, char ** argv) {
 				case id.types::controls:
 					switch(id.control) {
 						case id.controls::backspace:
-							if(command.size()) command.pop_back(); break;
+							if(command.size()) tools::utf8_pop(command); break;
 						case id.controls::enter:
 							history.insert(std::begin(history), command);
 							if(history.size() > max_history_size) history.pop_back();
-
+							redraw=true;
 							if(command=="exit") running=false;
 							else command.clear();
 						break;
@@ -88,10 +94,13 @@ int main(int argc, char ** argv) {
 
 		//TODO: We could be a bit more efficient and only redraw when needed...
 		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
-		for(const auto& _s : history) {
-			std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
+		if(redraw) {
+			for(const auto& _s : history) {
+				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
+			}
+			redraw=false;
 		}
-		std::cout<<tools::s::pos(3+command.size(),2)<<tools::s::flush();
+		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
 	}
 
 	return 0;

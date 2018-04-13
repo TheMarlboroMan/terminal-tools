@@ -1,6 +1,8 @@
 #ifndef TOOLS_TERMINAL_IN_H
 #define TOOLS_TERMINAL_IN_H
 
+#include <array>
+
 #include <termios.h> 	//termios.
 #include <unistd.h>
 #include <fcntl.h>
@@ -10,26 +12,28 @@ namespace tools {
 //! Holds the character/arrow/special function retrieved by the terminal.
 struct terminal_in_data {
 
-	enum class	types {chr, arrow, control, none, unknown};
+	enum class	types {chr, utf8, arrow, control, none, unknown};
 	enum class 	arrowkeys {none, up, down, left, right};
 	enum class	controls {none, enter, backspace, tab};
 
 			terminal_in_data();
 			operator bool() const {return type!=types::none;}
+	std::string	get_string_data() const {return std::string(buffer.data());}
+	bool		is_stringlike() const {return type==types::chr || type==types::utf8;}
+
 	void		set_unknown();
+	void		set_char();
+	void		set_utf8();
 	void		set_arrow_from_char(char _c);
-	void		set_char(char _c);
 	void		set_control(controls _c);
 	void		reset();
 
-	types		type;
-	char 		c;
-	//TODO: What about unicode?? We should have a char buffer or a std string.
-	//TODO: Perhaps WE always use a std::string??? It would be easier...
+	static const size_t		buffer_size=4;
+	types				type;
+	std::array<char, buffer_size>	buffer;
 	//TODO: And function keys??
-
-	arrowkeys 	arrow;
-	controls	control;
+	arrowkeys 			arrow;
+	controls			control;
 
 };
 
@@ -52,12 +56,12 @@ class terminal_in {
 
 	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10};
 
-	static const size_t	buffer_size=16;
+	static const int	escape_code=27;
+	static const int	open_square_bracket='[';
 
 	termios			terminal_savestate;
 	terminal_in_data	data;
 	fd_set 			set;
-	char			buffer[buffer_size];
 };
 
 }

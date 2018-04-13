@@ -9,7 +9,14 @@
 
 #include <fcntl.h>
 
+#include <utf8-tools.h>
+
 using namespace tools;
+
+terminal_in_data::terminal_in_data():
+	type{types::none}, arrow{arrowkeys::none}, control{controls::none} {
+	buffer.fill(0);
+}
 
 void terminal_in_data::set_unknown() {
 	type=types::unknown;
@@ -27,9 +34,12 @@ void terminal_in_data::set_arrow_from_char(char _c) {
 	}
 }
 
-void terminal_in_data::set_char(char _c) {
-	c=_c;
+void terminal_in_data::set_char() {
 	type=types::chr;
+}
+
+void terminal_in_data::set_utf8() {
+	type=types::utf8;
 }
 
 void terminal_in_data::set_control(controls _c) {
@@ -39,14 +49,11 @@ void terminal_in_data::set_control(controls _c) {
 
 void terminal_in_data::reset() {
 	type=types::none;
-	c=0; 
+	buffer.fill(0);
 	arrow=arrowkeys::none;
 	control=controls::none;
 }
 
-terminal_in_data::terminal_in_data():
-	type{types::none}, c{0}, arrow{arrowkeys::none}, control{controls::none} {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +116,7 @@ terminal_in_data& terminal_in::get() {
 	auto debug_buffer=[this](int read) {
 		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
 		for(int i=0; i<read; i++) {
-			std::cout<<i<<":"<<(unsigned short)buffer[i]<<" ("<<sizeof(buffer[i])<<") "<<CHAR_BIT<<" | ";
+			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
 		}
 		std::cout<<std::endl;
 	};
@@ -119,8 +126,7 @@ terminal_in_data& terminal_in::get() {
 	auto cp=set;
 	if(select(STDIN_FILENO+1, &cp, nullptr, nullptr, &tv) > 0) {
 
-		memset(buffer, 0, sizeof(buffer_size));
-		int readcount=read(STDIN_FILENO, buffer, buffer_size);
+		int readcount=read(STDIN_FILENO, &data.buffer, data.buffer_size);
 
 		//This is an alternative too...
 //		std::string buffer;
@@ -129,7 +135,7 @@ terminal_in_data& terminal_in::get() {
 //		int readcount=buffer.size();
 
 		if(readcount==1) {
-			switch(buffer[0]) {
+			switch(data.buffer[0]) {
 				case cc_backspace:
 					data.set_control(terminal_in_data::controls::backspace); break;
 				case cc_tab:
@@ -137,31 +143,35 @@ terminal_in_data& terminal_in::get() {
 				case cc_enter:
 					data.set_control(terminal_in_data::controls::enter); break;
 				default:
-					if(isprint(buffer[0])) {
-						data.set_char(buffer[0]);
+					if(isprint(data.buffer[0])) {
+						data.set_char();
+					}
+					else { //Unprintable.
+						data.set_unknown();
+					}
+				break;
+			}
+		}
+		else {
+			switch(data.buffer[0]) {
+				case escape_code:
+					if(open_square_bracket==data.buffer[1]) {
+						data.set_arrow_from_char(data.buffer[2]);
 					}
 					else {
 						data.set_unknown();
 						debug_buffer(readcount);
 					}
 				break;
-			}
-		}
-		else {
-			if(buffer[0]==27) {
-				//This is "["
-				//TODO; No magic numbers!
-				if(buffer[1]==91) {
-					data.set_arrow_from_char(buffer[2]);
-				}
-				else {
-					data.set_unknown();
-					debug_buffer(readcount);
-				}
-			}
-			else {
-				data.set_unknown();
-				debug_buffer(readcount);
+				default:
+					if(tools::is_utf8(data.buffer[0])) {
+						data.set_utf8();
+					}
+					else {
+						data.set_unknown();
+//						debug_buffer(readcount);
+					}
+				break;
 			}
 		}
 	}
