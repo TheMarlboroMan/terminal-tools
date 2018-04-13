@@ -25,6 +25,7 @@ struct terminal_in_data {
 	types		type;
 	char 		c;
 	//TODO: What about unicode?? We should have a char buffer or a std string.
+	//TODO: Perhaps WE always use a std::string??? It would be easier...
 	//TODO: And function keys??
 
 	arrowkeys 	arrow;
