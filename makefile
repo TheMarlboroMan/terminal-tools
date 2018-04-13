@@ -10,7 +10,7 @@ objdir:
 	mkdir obj;
 
 clean:
-	rm obj/*; rm ./a.out;
+	rm -rf obj; rmdir obj; rm ./a.out; 
 
 
 obj/terminal_out.o: src/terminal_out.h src/terminal_out.cpp
