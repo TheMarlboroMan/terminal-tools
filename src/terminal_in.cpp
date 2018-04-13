@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <string> //Getline... TODO
+///#include <string> //Getline... TODO
 #include <cstring>
 #include <climits> //CHAR_BIT
 
@@ -44,15 +44,11 @@ void terminal_in_data::reset() {
 	control=controls::none;
 }
 
-//TODO: And TAB????
-//TODO: And ENTER???
-//TODO: And function keys??
-//TODO: And unicode crap???
-
 terminal_in_data::terminal_in_data():
 	type{types::none}, c{0}, arrow{arrowkeys::none}, control{controls::none} {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 
 terminal_in::terminal_in() {
 
@@ -108,6 +104,8 @@ void terminal_in::flush() {
 terminal_in_data& terminal_in::get() {
 
 	data.reset();
+
+	//TODO... Oh, I see...
 	auto debug_buffer=[this](int read) {
 		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
 		for(int i=0; i<read; i++) {
