@@ -70,7 +70,8 @@ int main(int argc, char ** argv) {
 				case id.types::arrow:
 					std::cout<<tools::s::pos(1,1)<<"Good arrow press ("<<arrow_presses<<")..."<<std::endl; 
 					++arrow_presses; break;
-
+				case id.types::function:
+					std::cout<<tools::s::pos(1,1)<<"Function key press ("<<id.function<<")..."<<std::endl; break;
 				case id.types::controls:
 					switch(id.control) {
 						case id.controls::backspace:
@@ -93,14 +94,14 @@ int main(int argc, char ** argv) {
 		}
 
 		//TODO: We could be a bit more efficient and only redraw when needed...
-		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
-		if(redraw) {
-			for(const auto& _s : history) {
-				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
-			}
-			redraw=false;
-		}
-		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
+//		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
+//		if(redraw) {
+//			for(const auto& _s : history) {
+//				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
+//			}
+//			redraw=false;
+//		}
+//		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
 	}
 
 	return 0;

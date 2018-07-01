@@ -47,6 +47,11 @@ void terminal_in_data::set_control(controls _c) {
 	type=types::control;
 }
 
+void terminal_in_data::set_function(int _f) {
+	type=types::function;
+	function=_f+1; //Function keys are labelled 1 to 12.
+}
+
 void terminal_in_data::reset() {
 	type=types::none;
 	buffer.fill(0);
@@ -112,13 +117,14 @@ terminal_in_data& terminal_in::get() {
 
 	data.reset();
 
-//	auto debug_buffer=[this](int read) {
-//		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
-//		for(int i=0; i<read; i++) {
-//			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
-//		}
-//		std::cout<<std::endl;
-//	};
+//TODO: Remove in non debug builds...
+	auto debug_buffer=[this](int read) {
+		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
+		for(int i=0; i<read; i++) {
+			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
+		}
+		std::cout<<std::endl;
+	};
 
 	//This prevents blocking.
 	timeval tv {0, 10000};
@@ -152,14 +158,24 @@ terminal_in_data& terminal_in::get() {
 			}
 		}
 		else {
+			//TODO: SWITCH ON THE BUFFER SIZE, SEEMS BETTER.
 			switch(data.buffer[0]) {
+
+				
+
 				case escape_code:
-					if(open_square_bracket==data.buffer[1]) {
-						data.set_arrow_from_char(data.buffer[2]);
-					}
-					else {
-						data.set_unknown();
-//						debug_buffer(readcount);
+					switch(data.buffer[1]) {
+						case escape_arrow:
+							data.set_arrow_from_char(data.buffer[2]); break;
+						//TODO: This does not work with the tty1-4 terminals, which have different codes.
+						case escape_function_key_1_to_4:
+							data.set_function(data.buffer[2]-f1_code); break;
+						default:
+						//TODO: What about the rest?
+							std::cout<<"???"<<data.buffer[2]<<" "<<(int)data.buffer[2]<<std::endl;
+							data.set_unknown();
+//							debug_buffer(readcount); 
+						break;
 					}
 				break;
 				default:
@@ -168,7 +184,7 @@ terminal_in_data& terminal_in::get() {
 					}
 					else {
 						data.set_unknown();
-//						debug_buffer(readcount);
+						debug_buffer(readcount);
 					}
 				break;
 			}

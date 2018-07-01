@@ -12,7 +12,7 @@ namespace tools {
 //! Holds the character/arrow/special function retrieved by the terminal.
 struct terminal_in_data {
 
-	enum class	types {chr, utf8, arrow, control, none, unknown};
+	enum class	types {chr, utf8, arrow, control, function, none, unknown};
 	enum class 	arrowkeys {none, up, down, left, right};
 	enum class	controls {none, enter, backspace, tab};
 
@@ -24,16 +24,18 @@ struct terminal_in_data {
 	void		set_unknown();
 	void		set_char();
 	void		set_utf8();
-	void		set_arrow_from_char(char _c);
-	void		set_control(controls _c);
+	void		set_arrow_from_char(char);
+	void		set_control(controls);
+	void		set_function(int);
 	void		reset();
 
 	static const size_t		buffer_size=4;
 	types				type;
 	std::array<char, buffer_size>	buffer;
-	//TODO: And function keys??
+
 	arrowkeys 			arrow;
 	controls			control;
+	int				function;
 
 };
 
@@ -56,8 +58,11 @@ class terminal_in {
 
 	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10};
 
+	//The showkey command is our friend.
 	static const int	escape_code=27;
-	static const int	open_square_bracket='[';
+	static const int	escape_arrow=91;
+	static const int	escape_function_key_1_to_4=79;
+	static const int	f1_code=80;
 
 	termios			terminal_savestate;
 	terminal_in_data	data;
