@@ -85,6 +85,9 @@ int main(int argc, char ** argv) {
 						break;
 						case id.controls::tab:
 							command+="\t"; break;
+						case id.controls::escape:
+							running=false;
+						break;
 						case id.controls::none: break;
 					}
 				break;
@@ -94,14 +97,14 @@ int main(int argc, char ** argv) {
 		}
 
 		//TODO: We could be a bit more efficient and only redraw when needed...
-//		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
-//		if(redraw) {
-//			for(const auto& _s : history) {
-//				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
-//			}
-//			redraw=false;
-//		}
-//		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
+		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
+		if(redraw) {
+			for(const auto& _s : history) {
+				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
+			}
+			redraw=false;
+		}
+		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
 	}
 
 	return 0;

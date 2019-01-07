@@ -14,7 +14,7 @@ struct terminal_in_data {
 
 	enum class	types {chr, utf8, arrow, control, function, none, unknown};
 	enum class 	arrowkeys {none, up, down, left, right};
-	enum class	controls {none, enter, backspace, tab};
+	enum class	controls {none, enter, backspace, tab, escape};
 
 			terminal_in_data();
 			operator bool() const {return type!=types::none;}
@@ -56,7 +56,7 @@ class terminal_in {
 
 	private:
 
-	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10};
+	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10, cc_escape=27};
 
 	//The showkey command is our friend.
 	static const int	escape_code=27;

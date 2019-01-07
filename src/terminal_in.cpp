@@ -147,6 +147,8 @@ terminal_in_data& terminal_in::get() {
 					data.set_control(terminal_in_data::controls::tab); break;
 				case cc_enter:
 					data.set_control(terminal_in_data::controls::enter); break;
+				case cc_escape:
+					data.set_control(terminal_in_data::controls::escape); break;
 				default:
 					if(isprint(data.buffer[0])) {
 						data.set_char();
