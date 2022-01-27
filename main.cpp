@@ -72,7 +72,7 @@ int main(int argc, char ** argv) {
 					++arrow_presses; break;
 				case id.types::function:
 					std::cout<<tools::s::pos(1,1)<<"Function key press ("<<id.function<<")..."<<std::endl; break;
-				case id.types::controls:
+				case id.types::control:
 					switch(id.control) {
 						case id.controls::backspace:
 							if(command.size()) tools::utf8_pop(command); break;
