@@ -75,7 +75,10 @@ int main(int argc, char ** argv) {
 				case id.types::control:
 					switch(id.control) {
 						case id.controls::backspace:
-							if(command.size()) tools::utf8_pop(command); break;
+							if(command.size()) {
+								tools::utf8_pop(command); 
+							}
+						break;
 						case id.controls::enter:
 							history.insert(std::begin(history), command);
 							if(history.size() > max_history_size) history.pop_back();
