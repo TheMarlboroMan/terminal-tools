@@ -1,4 +1,4 @@
-#include "terminal_in.h"
+#include <tools/terminal_in.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -9,7 +9,7 @@
 
 #include <fcntl.h>
 
-#include <utf8-tools.h>
+#include <tools/utf8-tools.h>
 
 using namespace tools;
 

@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <utf8-tools.h>
+#include <tools/utf8-tools.h>
 
-#include "src/terminal_out.h"
-#include "src/terminal_in.h"
+#include <tools/terminal_out.h>
+#include <tools/terminal_in.h>
 
 
 /*
