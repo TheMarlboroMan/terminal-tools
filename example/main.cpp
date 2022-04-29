@@ -61,17 +61,22 @@ int main(int argc, char ** argv) {
 	while(running) {
 		std::flush(std::cout);
 		auto id=ti.get();
+		redraw=false;
 
 		if(id) {
+			redraw=true;
 			switch(id.type) {
 				case id.types::chr:
 				case id.types::utf8:
-					command+=id.get_string_data(); break;
+					command+=id.get_string_data(); 
+				break;
 				case id.types::arrow:
 					std::cout<<tools::s::pos(1,1)<<"Good arrow press ("<<arrow_presses<<")..."<<std::endl; 
-					++arrow_presses; break;
+					++arrow_presses; 
+				break;
 				case id.types::function:
-					std::cout<<tools::s::pos(1,1)<<"Function key press ("<<id.function<<")..."<<std::endl; break;
+					std::cout<<tools::s::pos(1,1)<<"Function key press ("<<id.function<<")..."<<std::endl; 
+				break;
 				case id.types::control:
 					switch(id.control) {
 						case id.controls::backspace:
@@ -82,33 +87,39 @@ int main(int argc, char ** argv) {
 						case id.controls::enter:
 							history.insert(std::begin(history), command);
 							if(history.size() > max_history_size) history.pop_back();
-							redraw=true;
 							if(command=="exit") running=false;
 							else command.clear();
 						break;
 						case id.controls::tab:
-							command+="\t"; break;
+							command+="\t"; 
+						break;
 						case id.controls::escape:
 							running=false;
 						break;
-						case id.controls::none: break;
+						case id.controls::none: 
+						break;
 					}
 				break;
 				case id.types::none:
-				case id.types::unknown: break;
+				case id.types::unknown: 
+					redraw=false;
+				break;
 			}
 		}
 
-		//TODO: We could be a bit more efficient and only redraw when needed...
-		std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
 		if(redraw) {
+				
+			std::cout<<tools::s::pos(1,2)<<tools::s::clear_line()<<">>"<<command<<"\n";
 			for(const auto& _s : history) {
+
 				std::cout<<tools::s::clear_right()<<"\t"<<_s<<"\n";
 			}
 			redraw=false;
+
+			std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
 		}
-		std::cout<<tools::s::pos(3+tools::utf8_size(command),2)<<tools::s::flush();
 	}
 
+	std::cout<<tools::s::reset();
 	return 0;
 }
