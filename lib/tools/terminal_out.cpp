@@ -139,18 +139,18 @@ std::ostream& tools::f::show(std::ostream& _s) {
 }
 
 //Set of stream manipulator functions...
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::save_pos& _t) {return tools::f::save_pos(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::load_pos& _t) {return tools::f::load_pos(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::save_pos&) {return tools::f::save_pos(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::load_pos&) {return tools::f::load_pos(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::pos& _t) {return tools::f::pos(_s, _t.x, _t.y);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::move& _t) {return tools::f::move(_s, _t.m, _t.d);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_line& _t) {return _t.t==-1 ? tools::f::clear_line(_s, _t.f) : tools::f::clear_line(_s, _t.f, _t.t);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_left& _t) {return tools::f::clear_left(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_right& _t) {return tools::f::clear_right(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset& _t) {return tools::f::reset(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_left&) {return tools::f::clear_left(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::clear_right&) {return tools::f::clear_right(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset&) {return tools::f::reset(_s);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_color& _t) {return tools::f::text_color(_s, _t.v);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::background_color& _t) {return tools::f::background_color(_s, _t.v);}
 std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::text_effect& _t) {return _t.v==-1 ? tools::f::text_effect(_s, _t.vec) : tools::f::text_effect(_s, _t.v);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset_text& _t) {return tools::f::reset_text(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::flush& _t) {return tools::f::flush(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::hide& _t) {return tools::f::hide(_s);}
-std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::show& _t) {return tools::f::show(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::reset_text&) {return tools::f::reset_text(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::flush&) {return tools::f::flush(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::hide&) {return tools::f::hide(_s);}
+std::ostream& tools::s::operator<<(std::ostream& _s, const tools::s::show&) {return tools::f::show(_s);}

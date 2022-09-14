@@ -107,7 +107,7 @@ terminal_in::~terminal_in() {
 }
 
 void terminal_in::flush() {
-	//TODO: Experiment with discarding shit.
+
 	if(0 > tcflush(STDIN_FILENO, TCIFLUSH)) {
 		throw std::runtime_error("Unable to flush input");
 	}
@@ -117,82 +117,69 @@ terminal_in_data& terminal_in::get() {
 
 	data.reset();
 
-//TODO: Remove in non debug builds...
-	auto debug_buffer=[this](int read) {
-		std::cout<<"READ "<<read<<" CHARS"<<std::endl;
-		for(int i=0; i<read; i++) {
-			std::cout<<i<<":"<<(unsigned short)data.buffer[i]<<" ("<<sizeof(data.buffer[i])<<") "<<CHAR_BIT<<" | ";
-		}
-		std::cout<<std::endl;
-	};
-
 	//This prevents blocking.
 	timeval tv {0, 10000};
 	auto cp=set;
-	if(select(STDIN_FILENO+1, &cp, nullptr, nullptr, &tv) > 0) {
+	if(select(STDIN_FILENO+1, &cp, nullptr, nullptr, &tv) <= 0) {
 
-		int readcount=read(STDIN_FILENO, &data.buffer, data.buffer_size);
-
-		//This is an alternative too...
-//		std::string buffer;
-//		std::getline(std::cin, buffer);
-//		std::cin.clear();
-//		int readcount=buffer.size();
-
-		if(readcount==1) {
-			switch(data.buffer[0]) {
-				case cc_backspace:
-					data.set_control(terminal_in_data::controls::backspace); break;
-				case cc_tab:
-					data.set_control(terminal_in_data::controls::tab); break;
-				case cc_enter:
-					data.set_control(terminal_in_data::controls::enter); break;
-				case cc_escape:
-					data.set_control(terminal_in_data::controls::escape); break;
-				default:
-					if(isprint(data.buffer[0])) {
-						data.set_char();
-					}
-					else { //Unprintable.
-						data.set_unknown();
-					}
-				break;
-			}
-		}
-		else {
-			//TODO: SWITCH ON THE BUFFER SIZE, SEEMS BETTER.
-			switch(data.buffer[0]) {
-
-				
-
-				case escape_code:
-					switch(data.buffer[1]) {
-						case escape_arrow:
-							data.set_arrow_from_char(data.buffer[2]); break;
-						//TODO: This does not work with the tty1-4 terminals, which have different codes.
-						case escape_function_key_1_to_4:
-							data.set_function(data.buffer[2]-f1_code); break;
-						default:
-						//TODO: What about the rest?
-							std::cout<<"???"<<data.buffer[2]<<" "<<(int)data.buffer[2]<<std::endl;
-							data.set_unknown();
-//							debug_buffer(readcount); 
-						break;
-					}
-				break;
-				default:
-					if(tools::is_utf8(data.buffer[0])) {
-						data.set_utf8();
-					}
-					else {
-						data.set_unknown();
-						debug_buffer(readcount);
-					}
-				break;
-			}
-		}
+		return data;
 	}
 
+	data.read=read(STDIN_FILENO, &data.buffer, data.buffer_size);
+
+	//one ordinary character...
+	if(data.read==1) {
+
+		switch(data.buffer[0]) {
+			case cc_backspace:
+				data.set_control(terminal_in_data::controls::backspace); break;
+			case cc_tab:
+				data.set_control(terminal_in_data::controls::tab); break;
+			case cc_enter:
+				data.set_control(terminal_in_data::controls::enter); break;
+			case cc_escape:
+				data.set_control(terminal_in_data::controls::escape); break;
+			default:
+				if(isprint(data.buffer[0])) {
+					data.set_char();
+				}
+				else { //Unprintable.
+					data.set_unknown();
+				}
+			break;
+		}
+
+		return data;
+	}
+
+	//an utf-8 sequence?
+	if(!(data.buffer[0]==escape_code_start && data.buffer[1]==escape_code_end)) {
+
+		if(tools::is_utf8(data.buffer[0])) {
+
+			data.set_utf8();
+			return data;
+		}
+
+		data.set_unknown();
+		return data;
+	}
+
+	//an arrow press... notice that we can assume that 0 and 1 compose an escape sequence.
+	if(data.read==3) {
+
+		data.set_arrow_from_char(data.buffer[2]);
+		return data;
+	}
+
+	if(data.read==4 && data.buffer[2]==escape_code_end) {
+
+		//f1 is 27 91 91 65 up to f5 which is 27 91 91 69. A +1 is added later.
+		data.set_function(data.buffer[3]-f1_code);
+		return data;
+	}
+
+	data.set_unknown();
 	return data;
 }
 

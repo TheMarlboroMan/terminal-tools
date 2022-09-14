@@ -41,6 +41,8 @@ if(${BUILD_EXAMPLES})
 	add_library(utf8-tools STATIC IMPORTED)
 	set_target_properties(utf8-tools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libutf8tools.a)
 
+	add_executable(buffer example/buffer.cpp)
+	target_link_libraries(buffer terminal-tools_shared utf8-tools)
 
 	add_executable(example example/main.cpp)
 	target_link_libraries(example terminal-tools_shared utf8-tools)

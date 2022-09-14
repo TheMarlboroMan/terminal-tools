@@ -29,7 +29,8 @@ struct terminal_in_data {
 	void		set_function(int);
 	void		reset();
 
-	static const size_t		buffer_size=4;
+	static const size_t		buffer_size=8; //TODO: check how much do we need.º
+	std::size_t			read; //how much was read in the last chunk.
 	types				type;
 	std::array<char, buffer_size>	buffer;
 
@@ -59,10 +60,9 @@ class terminal_in {
 	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10, cc_escape=27};
 
 	//The showkey command is our friend.
-	static const int	escape_code=27;
-	static const int	escape_arrow=91;
-	static const int	escape_function_key_1_to_4=79;
-	static const int	f1_code=80;
+	static const int	escape_code_start=27;
+	static const int    escape_code_end=91;
+	static const int	f1_code=65;
 
 	termios			terminal_savestate;
 	terminal_in_data	data;
