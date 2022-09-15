@@ -43,7 +43,7 @@ void draw_box() {
 }
 */
 
-int main(int argc, char ** argv) {
+int main(int, char **) {
 
 	const size_t		max_history_size=10;
 

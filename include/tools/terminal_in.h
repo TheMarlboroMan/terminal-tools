@@ -1,8 +1,7 @@
-#ifndef TOOLS_TERMINAL_IN_H
-#define TOOLS_TERMINAL_IN_H
+#pragma once
 
 #include <array>
-
+#include <memory>
 #include <termios.h> 	//termios.
 #include <unistd.h>
 #include <fcntl.h>
@@ -24,7 +23,7 @@ struct terminal_in_data {
 	void		set_unknown();
 	void		set_char();
 	void		set_utf8();
-	void		set_arrow_from_char(char);
+	void        set_arrow(arrowkeys);
 	void		set_control(controls);
 	void		set_function(int);
 	void		reset();
@@ -40,6 +39,35 @@ struct terminal_in_data {
 
 };
 
+/**
+* base class for a translator of terminal sequences that can understand 
+* different function keys, cursors and so on for different terminals.
+*/
+class terminal_sequence {
+
+	public:
+	virtual void read_sequences(terminal_in_data&)=0;
+};
+
+/**
+* sequences for the linux terminals (tty 1 to 6 or so...).
+*/
+class linux_terminal_sequences:
+	public terminal_sequence {
+	public:
+	void        read_sequences(terminal_in_data&);
+};
+
+/**
+*sequences for xterm, which are most (if not all) graphical terminals I have 
+tried.
+*/
+class xterm_terminal_sequences:
+	public terminal_sequence {
+	public:
+	void        read_sequences(terminal_in_data&);
+};
+
 //!Mediates with the terminal to disable line buffering and provide "real-time" key presses.
 
 //!Once constructed, regular input operations must be performed through it until
@@ -48,7 +76,7 @@ struct terminal_in_data {
 class terminal_in {
 	public:
 
-				terminal_in();
+				terminal_in(bool=true);
 				~terminal_in();
 	//!Flushes the input stream.
 	void			flush();
@@ -57,6 +85,8 @@ class terminal_in {
 
 	private:
 
+	void                setup_sequences(const std::string&);
+	//TODO: actually, these will... depend.
 	enum	control_chars {cc_tab=9, cc_backspace=127, cc_enter=10, cc_escape=27};
 
 	//The showkey command is our friend.
@@ -64,11 +94,11 @@ class terminal_in {
 	static const int    escape_code_end=91;
 	static const int	f1_code=65;
 
-	termios			terminal_savestate;
-	terminal_in_data	data;
-	fd_set 			set;
+	std::unique_ptr<terminal_sequence> sequence{nullptr};
+	termios             terminal_savestate;
+	terminal_in_data    data;
+	fd_set              set;
 };
 
 }
 
-#endif

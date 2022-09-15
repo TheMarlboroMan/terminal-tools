@@ -3,7 +3,7 @@
 
 int main(int, char **) {
 
-	tools::terminal_in in;
+	tools::terminal_in in(false);
 
 	while(true) {
 
